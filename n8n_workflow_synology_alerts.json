@@ -1,30 +1,31 @@
 {
-  "name": "Synology Alert Router",
+  "meta": {
+    "instanceId": "synology-alert-router"
+  },
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "synology-alerts",
         "responseMode": "onReceived",
-        "responseData": "allEntries",
         "options": {}
       },
-      "id": "webhook-trigger",
-      "name": "Webhook - Receive Alert",
+      "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1.1,
-      "position": [250, 300],
+      "typeVersion": 2,
+      "position": [260, 300],
+      "id": "webhook-1",
       "webhookId": "synology-alerts"
     },
     {
       "parameters": {
-        "jsCode": "// Parse Synology Alert\nconst text = $input.first().json.body?.text || $input.first().json.text || '';\nconst receivedAt = new Date().toISOString();\n\nlet hostname = 'unknown';\nlet date = '';\nlet time = '';\nlet eventMessage = text;\nlet format = 'unknown';\n\n// Check if structured format (contains 'A new system event')\nif (text.includes('A new system event')) {\n  format = 'structured';\n  const lines = text.split('\\n');\n  const headerMatch = lines[0].match(/on your ([\\w-]+) on (\\d{2}-\\d{2}-\\d{4}) at (\\d{2}:\\d{2})/);\n  if (headerMatch) {\n    hostname = headerMatch[1];\n    date = headerMatch[2];\n    time = headerMatch[3];\n  }\n  eventMessage = lines[1] || '';\n} else {\n  // Simple format: [hostname] message\n  format = 'simple';\n  const simpleMatch = text.match(/\\[([^\\]]+)\\] (.+)/);\n  if (simpleMatch) {\n    hostname = simpleMatch[1];\n    eventMessage = simpleMatch[2];\n  }\n}\n\n// Determine alert type\nlet alertType = 'unknown';\nlet category = 'Unknown';\nlet severity = 'Info';\nlet level = 'INFO';\n\n// Backup category\nif (eventMessage.match(/backup task.*completed successfully/i)) {\n  alertType = 'backup_completed';\n  category = 'Backup';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/backup task.*partially completed/i)) {\n  alertType = 'backup_partial';\n  category = 'Backup';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/backup task.*failed/i)) {\n  alertType = 'backup_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Backup task for .* completed/i)) {\n  alertType = 'active_backup_completed';\n  category = 'Backup';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/Backup task for .* failed/i)) {\n  alertType = 'active_backup_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Device .* is offline/i)) {\n  alertType = 'device_offline';\n  category = 'Backup';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/replication task.*failed/i)) {\n  alertType = 'replication_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n}\n// CMS category\nelse if (eventMessage.match(/managed server.*is offline/i)) {\n  alertType = 'server_offline';\n  category = 'CMS';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/managed server.*is online/i)) {\n  alertType = 'server_online';\n  category = 'CMS';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/unable to connect to the CMS/i)) {\n  alertType = 'cms_connection_failure';\n  category = 'CMS';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/reconnected to the CMS/i)) {\n  alertType = 'cms_connection_restored';\n  category = 'CMS';\n  severity = 'Info';\n  level = 'INFO';\n}\n// Storage category\nelse if (eventMessage.match(/Volume.*degraded/i)) {\n  alertType = 'volume_degraded';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Volume.*crashed/i)) {\n  alertType = 'volume_crashed';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Disk.*failing/i)) {\n  alertType = 'disk_failing';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Bad sectors/i)) {\n  alertType = 'disk_bad_sectors';\n  category = 'Storage';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/almost full|less than 1%/i)) {\n  alertType = 'storage_space_critical';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/\\d+% free space/i)) {\n  alertType = 'storage_space_low';\n  category = 'Storage';\n  severity = 'Warning';\n  level = 'WARN';\n}\n// Hardware category\nelse if (eventMessage.match(/Power failure/i)) {\n  alertType = 'ups_power_failure';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/UPS battery is low/i)) {\n  alertType = 'ups_low_battery';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/temperature.*high/i)) {\n  alertType = 'temperature_warning';\n  category = 'Hardware';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/Fan.*failed/i)) {\n  alertType = 'fan_failure';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n}\n// Security category\nelse if (eventMessage.match(/Failed login attempt/i)) {\n  alertType = 'login_failed';\n  category = 'Security';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/IP address.*blocked/i)) {\n  alertType = 'ip_blocked';\n  category = 'Security';\n  severity = 'Warning';\n  level = 'WARN';\n}\n// System category\nelse if (eventMessage.match(/Test Message/i)) {\n  alertType = 'test_message';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/DSM.*available/i)) {\n  alertType = 'dsm_update_available';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/Update available for/i)) {\n  alertType = 'package_update_available';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/System has started/i)) {\n  alertType = 'system_boot';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/System is shutting down/i)) {\n  alertType = 'system_shutdown';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n}\n\n// Extract additional data based on type\nlet extractedData = {};\n\nif (alertType === 'server_offline' || alertType === 'server_online') {\n  const ipMatch = eventMessage.match(/\\(([0-9.]+)\\)/);\n  if (ipMatch) extractedData.serverIp = ipMatch[1];\n}\n\nif (alertType === 'cms_connection_failure' || alertType === 'cms_connection_restored') {\n  const ipMatch = eventMessage.match(/\\(([0-9.]+)\\)/);\n  if (ipMatch) extractedData.cmsHostIp = ipMatch[1];\n}\n\nif (alertType === 'login_failed') {\n  const match = eventMessage.match(/from ([0-9.]+) for user (\\w+)/);\n  if (match) {\n    extractedData.sourceIp = match[1];\n    extractedData.username = match[2];\n  }\n}\n\nif (alertType === 'ip_blocked') {\n  const match = eventMessage.match(/IP address ([0-9.]+)/);\n  if (match) extractedData.blockedIp = match[1];\n}\n\nreturn {\n  json: {\n    // Original data\n    rawText: text,\n    receivedAt,\n    \n    // Parsed metadata\n    hostname,\n    date,\n    time,\n    format,\n    \n    // Alert classification\n    alertType,\n    category,\n    severity,\n    level,\n    \n    // Message content\n    eventMessage,\n    \n    // Extracted fields\n    ...extractedData\n  }\n};"
+        "jsCode": "// Parse Synology Alert\nconst text = $input.first().json.body?.text || $input.first().json.text || '';\nconst receivedAt = new Date().toISOString();\n\nlet hostname = 'unknown';\nlet date = '';\nlet time = '';\nlet eventMessage = text;\nlet format = 'unknown';\n\n// Check if structured format (contains 'A new system event')\nif (text.includes('A new system event')) {\n  format = 'structured';\n  const lines = text.split('\\n');\n  const headerMatch = lines[0].match(/on your ([\\w-]+) on (\\d{2}-\\d{2}-\\d{4}) at (\\d{2}:\\d{2})/);\n  if (headerMatch) {\n    hostname = headerMatch[1];\n    date = headerMatch[2];\n    time = headerMatch[3];\n  }\n  eventMessage = lines[1] || '';\n} else {\n  // Simple format: [hostname] message\n  format = 'simple';\n  const simpleMatch = text.match(/\\[([^\\]]+)\\] (.+)/);\n  if (simpleMatch) {\n    hostname = simpleMatch[1];\n    eventMessage = simpleMatch[2];\n  }\n}\n\n// Determine alert type\nlet alertType = 'unknown';\nlet category = 'Unknown';\nlet severity = 'Info';\nlet level = 'INFO';\n\n// Backup category\nif (eventMessage.match(/backup task.*completed successfully/i)) {\n  alertType = 'backup_completed';\n  category = 'Backup';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/backup task.*partially completed/i)) {\n  alertType = 'backup_partial';\n  category = 'Backup';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/backup task.*failed/i)) {\n  alertType = 'backup_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Backup task for .* completed/i)) {\n  alertType = 'active_backup_completed';\n  category = 'Backup';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/Backup task for .* failed/i)) {\n  alertType = 'active_backup_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Device .* is offline/i)) {\n  alertType = 'device_offline';\n  category = 'Backup';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/replication task.*failed/i)) {\n  alertType = 'replication_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n}\n// CMS category\nelse if (eventMessage.match(/managed server.*is offline/i)) {\n  alertType = 'server_offline';\n  category = 'CMS';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/managed server.*is online/i)) {\n  alertType = 'server_online';\n  category = 'CMS';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/unable to connect to the CMS/i)) {\n  alertType = 'cms_connection_failure';\n  category = 'CMS';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/reconnected to the CMS/i)) {\n  alertType = 'cms_connection_restored';\n  category = 'CMS';\n  severity = 'Info';\n  level = 'INFO';\n}\n// Storage category\nelse if (eventMessage.match(/Volume.*degraded/i)) {\n  alertType = 'volume_degraded';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Volume.*crashed/i)) {\n  alertType = 'volume_crashed';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Disk.*failing/i)) {\n  alertType = 'disk_failing';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Bad sectors/i)) {\n  alertType = 'disk_bad_sectors';\n  category = 'Storage';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/almost full|less than 1%/i)) {\n  alertType = 'storage_space_critical';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/\\d+% free space/i)) {\n  alertType = 'storage_space_low';\n  category = 'Storage';\n  severity = 'Warning';\n  level = 'WARN';\n}\n// Hardware category\nelse if (eventMessage.match(/Power failure/i)) {\n  alertType = 'ups_power_failure';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/UPS battery is low/i)) {\n  alertType = 'ups_low_battery';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/temperature.*high/i)) {\n  alertType = 'temperature_warning';\n  category = 'Hardware';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/Fan.*failed/i)) {\n  alertType = 'fan_failure';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n}\n// Security category\nelse if (eventMessage.match(/Failed login attempt/i)) {\n  alertType = 'login_failed';\n  category = 'Security';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/IP address.*blocked/i)) {\n  alertType = 'ip_blocked';\n  category = 'Security';\n  severity = 'Warning';\n  level = 'WARN';\n}\n// System category\nelse if (eventMessage.match(/Test Message/i)) {\n  alertType = 'test_message';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/DSM.*available/i)) {\n  alertType = 'dsm_update_available';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/Update available for/i)) {\n  alertType = 'package_update_available';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/System has started/i)) {\n  alertType = 'system_boot';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/System is shutting down/i)) {\n  alertType = 'system_shutdown';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n}\n\n// Extract additional data based on type\nlet extractedData = {};\n\nif (alertType === 'server_offline' || alertType === 'server_online') {\n  const ipMatch = eventMessage.match(/\\(([0-9.]+)\\)/);\n  if (ipMatch) extractedData.serverIp = ipMatch[1];\n}\n\nif (alertType === 'cms_connection_failure' || alertType === 'cms_connection_restored') {\n  const ipMatch = eventMessage.match(/\\(([0-9.]+)\\)/);\n  if (ipMatch) extractedData.cmsHostIp = ipMatch[1];\n}\n\nif (alertType === 'login_failed') {\n  const match = eventMessage.match(/from ([0-9.]+) for user (\\w+)/);\n  if (match) {\n    extractedData.sourceIp = match[1];\n    extractedData.username = match[2];\n  }\n}\n\nif (alertType === 'ip_blocked') {\n  const match = eventMessage.match(/IP address ([0-9.]+)/);\n  if (match) extractedData.blockedIp = match[1];\n}\n\nreturn {\n  json: {\n    rawText: text,\n    receivedAt,\n    hostname,\n    date,\n    time,\n    format,\n    alertType,\n    category,\n    severity,\n    level,\n    eventMessage,\n    ...extractedData\n  }\n};"
       },
-      "id": "parse-alert",
       "name": "Parse Alert",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [470, 300]
+      "position": [480, 300],
+      "id": "code-1"
     },
     {
       "parameters": {
@@ -36,6 +37,7 @@
           },
           "conditions": [
             {
+              "id": "condition-1",
               "leftValue": "={{ $json.category }}",
               "rightValue": "Backup",
               "operator": {
@@ -48,11 +50,11 @@
         },
         "options": {}
       },
-      "id": "is-backup",
-      "name": "Is Backup Alert?",
+      "name": "Is Backup?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [690, 300]
+      "position": [700, 300],
+      "id": "if-1"
     },
     {
       "parameters": {
@@ -68,6 +70,7 @@
                 },
                 "conditions": [
                   {
+                    "id": "cond-crit",
                     "leftValue": "={{ $json.severity }}",
                     "rightValue": "Critical",
                     "operator": {
@@ -89,6 +92,7 @@
                 },
                 "conditions": [
                   {
+                    "id": "cond-warn",
                     "leftValue": "={{ $json.severity }}",
                     "rightValue": "Warning",
                     "operator": {
@@ -106,111 +110,47 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "switch-severity",
       "name": "Route by Severity",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
-      "position": [910, 400]
-    },
-    {
-      "parameters": {
-        "content": "## Backup Alerts\n\nAll backup-related alerts come here regardless of severity:\n- Hyper Backup (completed, partial, failed)\n- Active Backup for Business\n- Snapshot Replication\n\n**Connect your Backup notification action here**",
-        "height": 180,
-        "width": 320,
-        "color": 4
-      },
-      "id": "note-backup",
-      "name": "Backup Handler Note",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [900, 20]
-    },
-    {
-      "parameters": {
-        "content": "## Critical Alerts (Non-Backup)\n\nCritical alerts that are NOT backup-related:\n- Server offline (CMS)\n- Volume crashed/degraded\n- Disk failing\n- UPS/Power issues\n- Fan failure\n\n**Connect your Critical notification action here**",
-        "height": 200,
-        "width": 320,
-        "color": 6
-      },
-      "id": "note-critical",
-      "name": "Critical Handler Note",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [1130, 220]
-    },
-    {
-      "parameters": {
-        "content": "## Warning Alerts (Non-Backup)\n\nWarning alerts that are NOT backup-related:\n- Bad sectors detected\n- Storage space low\n- Temperature high\n- Failed login attempts\n- IP blocked\n\n**Connect your Warning notification action here**",
-        "height": 200,
-        "width": 320,
-        "color": 5
-      },
-      "id": "note-warning",
-      "name": "Warning Handler Note",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [1130, 420]
-    },
-    {
-      "parameters": {
-        "content": "## Info Alerts (Ignored)\n\nNon-backup Info alerts are ignored:\n- Test messages\n- Server online\n- CMS reconnected\n- Updates available\n- System boot/shutdown\n\n**No action needed**",
-        "height": 180,
-        "width": 320,
-        "color": 2
-      },
-      "id": "note-info",
-      "name": "Info Ignored Note",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [1130, 620]
-    },
-    {
-      "parameters": {
-        "content": "# Synology Alert Router\n\n## Routing Logic:\n\n1. **Backup alerts** (any severity) → Backup node\n2. **Critical alerts** (non-backup) → Critical node\n3. **Warning alerts** (non-backup) → Warning node\n4. **Info alerts** (non-backup) → Ignored\n\n## Parsed Data Available:\n- `hostname` - Source NAS\n- `alertType` - Specific alert type\n- `category` - Backup, CMS, Storage, etc.\n- `severity` - Critical, Warning, Info\n- `eventMessage` - The alert message\n- `date` / `time` - When it occurred",
-        "height": 340,
-        "width": 340
-      },
-      "id": "note-main",
-      "name": "Workflow Info",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [-120, 140]
+      "position": [920, 400],
+      "id": "switch-1"
     },
     {
       "parameters": {},
-      "id": "noop-info",
-      "name": "No Operation (Info Ignored)",
+      "name": "Backup Action",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1130, 560]
+      "position": [920, 200],
+      "id": "noop-backup"
     },
     {
       "parameters": {},
-      "id": "backup-action",
-      "name": "Backup Action (TODO)",
+      "name": "Critical Action",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [910, 200]
+      "position": [1140, 300],
+      "id": "noop-critical"
     },
     {
       "parameters": {},
-      "id": "critical-action",
-      "name": "Critical Action (TODO)",
+      "name": "Warning Action",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1130, 340]
+      "position": [1140, 420],
+      "id": "noop-warning"
     },
     {
       "parameters": {},
-      "id": "warning-action",
-      "name": "Warning Action (TODO)",
+      "name": "Info Ignored",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1130, 480]
+      "position": [1140, 540],
+      "id": "noop-info"
     }
   ],
   "connections": {
-    "Webhook - Receive Alert": {
+    "Webhook": {
       "main": [
         [
           {
@@ -225,18 +165,18 @@
       "main": [
         [
           {
-            "node": "Is Backup Alert?",
+            "node": "Is Backup?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Is Backup Alert?": {
+    "Is Backup?": {
       "main": [
         [
           {
-            "node": "Backup Action (TODO)",
+            "node": "Backup Action",
             "type": "main",
             "index": 0
           }
@@ -254,21 +194,21 @@
       "main": [
         [
           {
-            "node": "Critical Action (TODO)",
+            "node": "Critical Action",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Warning Action (TODO)",
+            "node": "Warning Action",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "No Operation (Info Ignored)",
+            "node": "Info Ignored",
             "type": "main",
             "index": 0
           }
@@ -276,12 +216,5 @@
       ]
     }
   },
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "staticData": null,
-  "tags": [],
-  "triggerCount": 0,
-  "updatedAt": "2026-02-11T23:00:00.000Z",
-  "versionId": "2"
+  "pinData": {}
 }
