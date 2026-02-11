@@ -1,0 +1,8 @@
+{
+  "type": "storage_space_low",
+  "category": "Storage",
+  "level": "WARN",
+  "body": {
+    "text": "[storage] Volume 1 has only 10% free space remaining"
+  }
+}

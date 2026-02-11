@@ -1,0 +1,8 @@
+{
+  "type": "replication_failed",
+  "category": "Replication",
+  "level": "ERROR",
+  "body": {
+    "text": "[storage] Snapshot replication task [Offsite Backup] failed"
+  }
+}

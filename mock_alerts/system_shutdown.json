@@ -1,0 +1,8 @@
+{
+  "type": "system_shutdown",
+  "category": "System",
+  "level": "INFO",
+  "body": {
+    "text": "[storage] System is shutting down"
+  }
+}

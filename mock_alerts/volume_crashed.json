@@ -1,0 +1,8 @@
+{
+  "type": "volume_crashed",
+  "category": "Storage",
+  "level": "ERROR",
+  "body": {
+    "text": "[storage] Volume 1 has crashed"
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "_metadata": {
+    "description": "Synology DSM Notification Types Reference",
+    "generated": "2026-02-11",
+    "webhook_config": {
+      "prefix": "[storage]",
+      "body_template": "{\"text\": \"@@TEXT@@\"}",
+      "levels": ["NOTIFICATION_INFO", "NOTIFICATION_WARN", "NOTIFICATION_ERROR"]
+    },
+    "message_formats": {
+      "simple": "[hostname] message",
+      "structured": "A new system event occurred on your hostname on DD-MM-YYYY at HH:MM.\nmessage"
+    }
+  },
+
+  "notification_types": {
+    "test_message": {
+      "category": "System",
+      "level": "INFO",
+      "description": "Test notification sent from DSM UI or API",
+      "example_body": {
+        "text": "[storage] Test Message from storage"
+      },
+      "regex_pattern": "\\[([^\\]]+)\\] Test Message from \\1"
+    },
+
+    "server_offline": {
+      "category": "CMS (Central Management System)",
+      "level": "ERROR",
+      "description": "A managed server in the CMS cluster has gone offline",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 21:36.\nA managed server (185.102.219.107) is offline"
+      },
+      "regex_pattern": "A managed server \\(([0-9.]+)\\) is offline",
+      "extracted_fields": {
+        "server_ip": "IP address of the offline server"
+      }
+    },
+
+    "server_online": {
+      "category": "CMS (Central Management System)",
+      "level": "INFO",
+      "description": "A managed server in the CMS cluster has come back online",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 21:40.\nA managed server (185.102.219.107) is online"
+      },
+      "regex_pattern": "A managed server \\(([0-9.]+)\\) is online"
+    },
+
+    "cms_connection_failure": {
+      "category": "CMS (Central Management System)",
+      "level": "ERROR",
+      "description": "Unable to connect to the CMS host server",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 21:23.\nhost01 is unable to connect to the CMS Host (10.10.12.23)"
+      },
+      "regex_pattern": "([\\w-]+) is unable to connect to the CMS Host \\(([0-9.]+)\\)",
+      "extracted_fields": {
+        "hostname": "Name of the NAS that lost connection",
+        "cms_host_ip": "IP address of the CMS host"
+      }
+    },
+
+    "cms_connection_restored": {
+      "category": "CMS (Central Management System)",
+      "level": "INFO",
+      "description": "Connection to CMS host has been restored",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 21:25.\nhost01 has reconnected to the CMS Host (10.10.12.23)"
+      },
+      "regex_pattern": "([\\w-]+) has reconnected to the CMS Host \\(([0-9.]+)\\)"
+    },
+
+    "backup_completed": {
+      "category": "Hyper Backup",
+      "level": "INFO",
+      "description": "Backup task completed successfully",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 03:00.\nData backup task [TaskName] on host01 completed successfully"
+      },
+      "regex_pattern": "Data backup task \\[?([^\\]]+)\\]? on ([\\w-]+) completed successfully"
+    },
+
+    "backup_partial": {
+      "category": "Hyper Backup",
+      "level": "WARN",
+      "description": "Backup task partially completed (some files may have failed)",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 21:28.\nData backup task on host01 partially completed"
+      },
+      "regex_pattern": "Data backup task.*on ([\\w-]+) partially completed"
+    },
+
+    "backup_failed": {
+      "category": "Hyper Backup",
+      "level": "ERROR",
+      "description": "Backup task failed",
+      "example_body": {
+        "text": "A new system event occurred on your host01 on 11-02-2026 at 03:00.\nData backup task [TaskName] on host01 failed"
+      },
+      "regex_pattern": "Data backup task \\[?([^\\]]+)\\]? on ([\\w-]+) failed"
+    },
+
+    "volume_degraded": {
+      "category": "Storage",
+      "level": "ERROR",
+      "description": "Storage volume is in degraded state (disk failure)",
+      "example_body": {
+        "text": "[storage] Volume 1 is in degraded mode"
+      },
+      "regex_pattern": "Volume ([0-9]+) is in degraded mode"
+    },
+
+    "volume_crashed": {
+      "category": "Storage",
+      "level": "ERROR",
+      "description": "Storage volume has crashed",
+      "example_body": {
+        "text": "[storage] Volume 1 has crashed"
+      },
+      "regex_pattern": "Volume ([0-9]+) has crashed"
+    },
+
+    "disk_failing": {
+      "category": "Storage",
+      "level": "ERROR",
+      "description": "Disk is showing signs of failure",
+      "example_body": {
+        "text": "[storage] Disk 1 is failing. Please replace it immediately."
+      },
+      "regex_pattern": "Disk ([0-9]+) is failing"
+    },
+
+    "disk_bad_sectors": {
+      "category": "Storage",
+      "level": "WARN",
+      "description": "Disk has bad sectors",
+      "example_body": {
+        "text": "[storage] Bad sectors were detected on Disk 1"
+      },
+      "regex_pattern": "Bad sectors were detected on Disk ([0-9]+)"
+    },
+
+    "storage_space_low": {
+      "category": "Storage",
+      "level": "WARN",
+      "description": "Storage space is running low",
+      "example_body": {
+        "text": "[storage] Volume 1 has only 10% free space remaining"
+      },
+      "regex_pattern": "Volume ([0-9]+) has only ([0-9]+)% free space"
+    },
+
+    "storage_space_critical": {
+      "category": "Storage",
+      "level": "ERROR",
+      "description": "Storage space is critically low",
+      "example_body": {
+        "text": "[storage] Volume 1 is almost full (less than 1% free space)"
+      },
+      "regex_pattern": "Volume ([0-9]+) is almost full"
+    },
+
+    "ups_power_failure": {
+      "category": "Hardware",
+      "level": "ERROR",
+      "description": "Power failure detected, running on UPS battery",
+      "example_body": {
+        "text": "[storage] Power failure detected. System is running on UPS battery."
+      },
+      "regex_pattern": "Power failure detected"
+    },
+
+    "ups_low_battery": {
+      "category": "Hardware",
+      "level": "ERROR",
+      "description": "UPS battery is low, system will shut down soon",
+      "example_body": {
+        "text": "[storage] UPS battery is low. System will shut down in 5 minutes."
+      },
+      "regex_pattern": "UPS battery is low"
+    },
+
+    "temperature_warning": {
+      "category": "Hardware",
+      "level": "WARN",
+      "description": "System temperature is high",
+      "example_body": {
+        "text": "[storage] System temperature is high (65°C)"
+      },
+      "regex_pattern": "System temperature is high \\(([0-9]+)°C\\)"
+    },
+
+    "fan_failure": {
+      "category": "Hardware",
+      "level": "ERROR",
+      "description": "System fan has failed",
+      "example_body": {
+        "text": "[storage] Fan 1 has failed"
+      },
+      "regex_pattern": "Fan ([0-9]+) has failed"
+    },
+
+    "login_failed": {
+      "category": "Security",
+      "level": "WARN",
+      "description": "Failed login attempt detected",
+      "example_body": {
+        "text": "[storage] Failed login attempt from 192.168.1.100 for user admin"
+      },
+      "regex_pattern": "Failed login attempt from ([0-9.]+) for user ([\\w-]+)"
+    },
+
+    "ip_blocked": {
+      "category": "Security",
+      "level": "WARN",
+      "description": "IP address has been blocked due to multiple failed login attempts",
+      "example_body": {
+        "text": "[storage] IP address 192.168.1.100 has been blocked"
+      },
+      "regex_pattern": "IP address ([0-9.]+) has been blocked"
+    },
+
+    "dsm_update_available": {
+      "category": "System",
+      "level": "INFO",
+      "description": "DSM update is available",
+      "example_body": {
+        "text": "[storage] DSM 7.2-64570 Update 3 is available"
+      },
+      "regex_pattern": "DSM ([0-9.-]+) (Update [0-9]+)? is available"
+    },
+
+    "package_update_available": {
+      "category": "System",
+      "level": "INFO",
+      "description": "Package update is available",
+      "example_body": {
+        "text": "[storage] Update available for Hyper Backup"
+      },
+      "regex_pattern": "Update available for ([\\w\\s]+)"
+    },
+
+    "system_boot": {
+      "category": "System",
+      "level": "INFO",
+      "description": "System has booted up",
+      "example_body": {
+        "text": "[storage] System has started up"
+      },
+      "regex_pattern": "System has started up"
+    },
+
+    "system_shutdown": {
+      "category": "System",
+      "level": "INFO",
+      "description": "System is shutting down",
+      "example_body": {
+        "text": "[storage] System is shutting down"
+      },
+      "regex_pattern": "System is shutting down"
+    },
+
+    "replication_failed": {
+      "category": "Replication",
+      "level": "ERROR",
+      "description": "Snapshot replication task failed",
+      "example_body": {
+        "text": "[storage] Snapshot replication task [TaskName] failed"
+      },
+      "regex_pattern": "Snapshot replication task \\[([^\\]]+)\\] failed"
+    },
+
+    "active_backup_completed": {
+      "category": "Active Backup for Business",
+      "level": "INFO",
+      "description": "Active Backup task completed",
+      "example_body": {
+        "text": "[storage] Backup task for PC-001 completed successfully"
+      },
+      "regex_pattern": "Backup task for ([\\w-]+) completed"
+    },
+
+    "active_backup_failed": {
+      "category": "Active Backup for Business",
+      "level": "ERROR",
+      "description": "Active Backup task failed",
+      "example_body": {
+        "text": "[storage] Backup task for PC-001 failed"
+      },
+      "regex_pattern": "Backup task for ([\\w-]+) failed"
+    },
+
+    "device_offline": {
+      "category": "Active Backup for Business",
+      "level": "WARN",
+      "description": "Managed device has gone offline",
+      "example_body": {
+        "text": "[storage] Device PC-001 is offline"
+      },
+      "regex_pattern": "Device ([\\w-]+) is offline"
+    }
+  },
+
+  "parsing_examples": {
+    "n8n_function_node": "// Parse Synology notification\nconst text = $json.body.text;\nconst lines = text.split('\\n');\n\nlet hostname, date, time, eventMessage, eventType;\n\n// Check if structured format (contains 'A new system event')\nif (text.includes('A new system event')) {\n  const headerMatch = lines[0].match(/on your ([\\w-]+) on (\\d{2}-\\d{2}-\\d{4}) at (\\d{2}:\\d{2})/);\n  if (headerMatch) {\n    hostname = headerMatch[1];\n    date = headerMatch[2];\n    time = headerMatch[3];\n  }\n  eventMessage = lines[1] || '';\n} else {\n  // Simple format: [hostname] message\n  const simpleMatch = text.match(/\\[([^\\]]+)\\] (.+)/);\n  if (simpleMatch) {\n    hostname = simpleMatch[1];\n    eventMessage = simpleMatch[2];\n  }\n}\n\n// Categorize event type\nif (eventMessage.includes('is offline')) eventType = 'server_offline';\nelse if (eventMessage.includes('is online')) eventType = 'server_online';\nelse if (eventMessage.includes('unable to connect')) eventType = 'cms_connection_failure';\nelse if (eventMessage.includes('partially completed')) eventType = 'backup_partial';\nelse if (eventMessage.includes('failed')) eventType = 'backup_failed';\nelse if (eventMessage.includes('completed')) eventType = 'backup_completed';\nelse if (eventMessage.includes('Test Message')) eventType = 'test_message';\nelse if (eventMessage.includes('degraded')) eventType = 'volume_degraded';\nelse if (eventMessage.includes('crashed')) eventType = 'volume_crashed';\nelse eventType = 'unknown';\n\nreturn { hostname, date, time, eventMessage, eventType };",
+
+    "severity_mapping": {
+      "ERROR": ["server_offline", "cms_connection_failure", "backup_failed", "volume_degraded", "volume_crashed", "disk_failing", "ups_power_failure", "ups_low_battery", "fan_failure", "replication_failed", "active_backup_failed"],
+      "WARN": ["backup_partial", "disk_bad_sectors", "storage_space_low", "temperature_warning", "login_failed", "ip_blocked", "device_offline"],
+      "INFO": ["test_message", "server_online", "cms_connection_restored", "backup_completed", "dsm_update_available", "package_update_available", "system_boot", "system_shutdown", "active_backup_completed"]
+    }
+  }
+}

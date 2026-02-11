@@ -1,0 +1,8 @@
+{
+  "type": "ups_power_failure",
+  "category": "Hardware",
+  "level": "ERROR",
+  "body": {
+    "text": "[storage] Power failure detected. System is running on UPS battery."
+  }
+}

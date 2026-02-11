@@ -1,0 +1,8 @@
+{
+  "type": "disk_bad_sectors",
+  "category": "Storage",
+  "level": "WARN",
+  "body": {
+    "text": "[storage] Bad sectors were detected on Disk 3"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "fan_failure",
+  "category": "Hardware",
+  "level": "ERROR",
+  "body": {
+    "text": "[storage] Fan 1 has failed"
+  }
+}

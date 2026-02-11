@@ -1,0 +1,8 @@
+{
+  "type": "volume_degraded",
+  "category": "Storage",
+  "level": "ERROR",
+  "body": {
+    "text": "[storage] Volume 1 is in degraded mode"
+  }
+}

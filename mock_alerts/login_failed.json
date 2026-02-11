@@ -1,0 +1,8 @@
+{
+  "type": "login_failed",
+  "category": "Security",
+  "level": "WARN",
+  "body": {
+    "text": "[storage] Failed login attempt from 192.168.1.100 for user admin"
+  }
+}

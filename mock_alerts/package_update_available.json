@@ -1,0 +1,8 @@
+{
+  "type": "package_update_available",
+  "category": "System",
+  "level": "INFO",
+  "body": {
+    "text": "[storage] Update available for Hyper Backup"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "system_boot",
+  "category": "System",
+  "level": "INFO",
+  "body": {
+    "text": "[storage] System has started up"
+  }
+}

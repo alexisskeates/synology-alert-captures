@@ -1,0 +1,8 @@
+{
+  "type": "test_message",
+  "category": "System",
+  "level": "INFO",
+  "body": {
+    "text": "[storage] Test Message from storage"
+  }
+}
