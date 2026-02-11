@@ -1,152 +1,92 @@
 {
-  "meta": {
-    "instanceId": "synology-alert-router"
-  },
+  "name": "Synology Alert Router",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "synology-alerts",
-        "responseMode": "onReceived",
-        "options": {}
+        "responseMode": "onReceived"
       },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [260, 300],
-      "id": "webhook-1",
-      "webhookId": "synology-alerts"
+      "typeVersion": 1,
+      "position": [260, 300]
     },
     {
       "parameters": {
-        "jsCode": "// Parse Synology Alert\nconst text = $input.first().json.body?.text || $input.first().json.text || '';\nconst receivedAt = new Date().toISOString();\n\nlet hostname = 'unknown';\nlet date = '';\nlet time = '';\nlet eventMessage = text;\nlet format = 'unknown';\n\n// Check if structured format (contains 'A new system event')\nif (text.includes('A new system event')) {\n  format = 'structured';\n  const lines = text.split('\\n');\n  const headerMatch = lines[0].match(/on your ([\\w-]+) on (\\d{2}-\\d{2}-\\d{4}) at (\\d{2}:\\d{2})/);\n  if (headerMatch) {\n    hostname = headerMatch[1];\n    date = headerMatch[2];\n    time = headerMatch[3];\n  }\n  eventMessage = lines[1] || '';\n} else {\n  // Simple format: [hostname] message\n  format = 'simple';\n  const simpleMatch = text.match(/\\[([^\\]]+)\\] (.+)/);\n  if (simpleMatch) {\n    hostname = simpleMatch[1];\n    eventMessage = simpleMatch[2];\n  }\n}\n\n// Determine alert type\nlet alertType = 'unknown';\nlet category = 'Unknown';\nlet severity = 'Info';\nlet level = 'INFO';\n\n// Backup category\nif (eventMessage.match(/backup task.*completed successfully/i)) {\n  alertType = 'backup_completed';\n  category = 'Backup';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/backup task.*partially completed/i)) {\n  alertType = 'backup_partial';\n  category = 'Backup';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/backup task.*failed/i)) {\n  alertType = 'backup_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Backup task for .* completed/i)) {\n  alertType = 'active_backup_completed';\n  category = 'Backup';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/Backup task for .* failed/i)) {\n  alertType = 'active_backup_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Device .* is offline/i)) {\n  alertType = 'device_offline';\n  category = 'Backup';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/replication task.*failed/i)) {\n  alertType = 'replication_failed';\n  category = 'Backup';\n  severity = 'Critical';\n  level = 'ERROR';\n}\n// CMS category\nelse if (eventMessage.match(/managed server.*is offline/i)) {\n  alertType = 'server_offline';\n  category = 'CMS';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/managed server.*is online/i)) {\n  alertType = 'server_online';\n  category = 'CMS';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/unable to connect to the CMS/i)) {\n  alertType = 'cms_connection_failure';\n  category = 'CMS';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/reconnected to the CMS/i)) {\n  alertType = 'cms_connection_restored';\n  category = 'CMS';\n  severity = 'Info';\n  level = 'INFO';\n}\n// Storage category\nelse if (eventMessage.match(/Volume.*degraded/i)) {\n  alertType = 'volume_degraded';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Volume.*crashed/i)) {\n  alertType = 'volume_crashed';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Disk.*failing/i)) {\n  alertType = 'disk_failing';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/Bad sectors/i)) {\n  alertType = 'disk_bad_sectors';\n  category = 'Storage';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/almost full|less than 1%/i)) {\n  alertType = 'storage_space_critical';\n  category = 'Storage';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/\\d+% free space/i)) {\n  alertType = 'storage_space_low';\n  category = 'Storage';\n  severity = 'Warning';\n  level = 'WARN';\n}\n// Hardware category\nelse if (eventMessage.match(/Power failure/i)) {\n  alertType = 'ups_power_failure';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/UPS battery is low/i)) {\n  alertType = 'ups_low_battery';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n} else if (eventMessage.match(/temperature.*high/i)) {\n  alertType = 'temperature_warning';\n  category = 'Hardware';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/Fan.*failed/i)) {\n  alertType = 'fan_failure';\n  category = 'Hardware';\n  severity = 'Critical';\n  level = 'ERROR';\n}\n// Security category\nelse if (eventMessage.match(/Failed login attempt/i)) {\n  alertType = 'login_failed';\n  category = 'Security';\n  severity = 'Warning';\n  level = 'WARN';\n} else if (eventMessage.match(/IP address.*blocked/i)) {\n  alertType = 'ip_blocked';\n  category = 'Security';\n  severity = 'Warning';\n  level = 'WARN';\n}\n// System category\nelse if (eventMessage.match(/Test Message/i)) {\n  alertType = 'test_message';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/DSM.*available/i)) {\n  alertType = 'dsm_update_available';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/Update available for/i)) {\n  alertType = 'package_update_available';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/System has started/i)) {\n  alertType = 'system_boot';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n} else if (eventMessage.match(/System is shutting down/i)) {\n  alertType = 'system_shutdown';\n  category = 'System';\n  severity = 'Info';\n  level = 'INFO';\n}\n\n// Extract additional data based on type\nlet extractedData = {};\n\nif (alertType === 'server_offline' || alertType === 'server_online') {\n  const ipMatch = eventMessage.match(/\\(([0-9.]+)\\)/);\n  if (ipMatch) extractedData.serverIp = ipMatch[1];\n}\n\nif (alertType === 'cms_connection_failure' || alertType === 'cms_connection_restored') {\n  const ipMatch = eventMessage.match(/\\(([0-9.]+)\\)/);\n  if (ipMatch) extractedData.cmsHostIp = ipMatch[1];\n}\n\nif (alertType === 'login_failed') {\n  const match = eventMessage.match(/from ([0-9.]+) for user (\\w+)/);\n  if (match) {\n    extractedData.sourceIp = match[1];\n    extractedData.username = match[2];\n  }\n}\n\nif (alertType === 'ip_blocked') {\n  const match = eventMessage.match(/IP address ([0-9.]+)/);\n  if (match) extractedData.blockedIp = match[1];\n}\n\nreturn {\n  json: {\n    rawText: text,\n    receivedAt,\n    hostname,\n    date,\n    time,\n    format,\n    alertType,\n    category,\n    severity,\n    level,\n    eventMessage,\n    ...extractedData\n  }\n};"
+        "functionCode": "// Parse Synology Alert\nconst text = items[0].json.body?.text || items[0].json.text || '';\nconst receivedAt = new Date().toISOString();\n\nlet hostname = 'unknown';\nlet date = '';\nlet time = '';\nlet eventMessage = text;\nlet format = 'unknown';\n\n// Check if structured format\nif (text.includes('A new system event')) {\n  format = 'structured';\n  const lines = text.split('\\n');\n  const headerMatch = lines[0].match(/on your ([\\w-]+) on (\\d{2}-\\d{2}-\\d{4}) at (\\d{2}:\\d{2})/);\n  if (headerMatch) {\n    hostname = headerMatch[1];\n    date = headerMatch[2];\n    time = headerMatch[3];\n  }\n  eventMessage = lines[1] || '';\n} else {\n  format = 'simple';\n  const simpleMatch = text.match(/\\[([^\\]]+)\\] (.+)/);\n  if (simpleMatch) {\n    hostname = simpleMatch[1];\n    eventMessage = simpleMatch[2];\n  }\n}\n\nlet alertType = 'unknown';\nlet category = 'Unknown';\nlet severity = 'Info';\n\n// Backup category\nif (/backup task.*completed successfully/i.test(eventMessage)) {\n  alertType = 'backup_completed'; category = 'Backup'; severity = 'Info';\n} else if (/backup task.*partially completed/i.test(eventMessage)) {\n  alertType = 'backup_partial'; category = 'Backup'; severity = 'Warning';\n} else if (/backup task.*failed/i.test(eventMessage)) {\n  alertType = 'backup_failed'; category = 'Backup'; severity = 'Critical';\n} else if (/Backup task for .* completed/i.test(eventMessage)) {\n  alertType = 'active_backup_completed'; category = 'Backup'; severity = 'Info';\n} else if (/Backup task for .* failed/i.test(eventMessage)) {\n  alertType = 'active_backup_failed'; category = 'Backup'; severity = 'Critical';\n} else if (/Device .* is offline/i.test(eventMessage)) {\n  alertType = 'device_offline'; category = 'Backup'; severity = 'Warning';\n} else if (/replication task.*failed/i.test(eventMessage)) {\n  alertType = 'replication_failed'; category = 'Backup'; severity = 'Critical';\n}\n// CMS category\nelse if (/managed server.*is offline/i.test(eventMessage)) {\n  alertType = 'server_offline'; category = 'CMS'; severity = 'Critical';\n} else if (/managed server.*is online/i.test(eventMessage)) {\n  alertType = 'server_online'; category = 'CMS'; severity = 'Info';\n} else if (/unable to connect to the CMS/i.test(eventMessage)) {\n  alertType = 'cms_connection_failure'; category = 'CMS'; severity = 'Critical';\n} else if (/reconnected to the CMS/i.test(eventMessage)) {\n  alertType = 'cms_connection_restored'; category = 'CMS'; severity = 'Info';\n}\n// Storage category\nelse if (/Volume.*degraded/i.test(eventMessage)) {\n  alertType = 'volume_degraded'; category = 'Storage'; severity = 'Critical';\n} else if (/Volume.*crashed/i.test(eventMessage)) {\n  alertType = 'volume_crashed'; category = 'Storage'; severity = 'Critical';\n} else if (/Disk.*failing/i.test(eventMessage)) {\n  alertType = 'disk_failing'; category = 'Storage'; severity = 'Critical';\n} else if (/Bad sectors/i.test(eventMessage)) {\n  alertType = 'disk_bad_sectors'; category = 'Storage'; severity = 'Warning';\n} else if (/almost full|less than 1%/i.test(eventMessage)) {\n  alertType = 'storage_space_critical'; category = 'Storage'; severity = 'Critical';\n} else if (/\\d+% free space/i.test(eventMessage)) {\n  alertType = 'storage_space_low'; category = 'Storage'; severity = 'Warning';\n}\n// Hardware category\nelse if (/Power failure/i.test(eventMessage)) {\n  alertType = 'ups_power_failure'; category = 'Hardware'; severity = 'Critical';\n} else if (/UPS battery is low/i.test(eventMessage)) {\n  alertType = 'ups_low_battery'; category = 'Hardware'; severity = 'Critical';\n} else if (/temperature.*high/i.test(eventMessage)) {\n  alertType = 'temperature_warning'; category = 'Hardware'; severity = 'Warning';\n} else if (/Fan.*failed/i.test(eventMessage)) {\n  alertType = 'fan_failure'; category = 'Hardware'; severity = 'Critical';\n}\n// Security category\nelse if (/Failed login attempt/i.test(eventMessage)) {\n  alertType = 'login_failed'; category = 'Security'; severity = 'Warning';\n} else if (/IP address.*blocked/i.test(eventMessage)) {\n  alertType = 'ip_blocked'; category = 'Security'; severity = 'Warning';\n}\n// System category\nelse if (/Test Message/i.test(eventMessage)) {\n  alertType = 'test_message'; category = 'System'; severity = 'Info';\n} else if (/DSM.*available/i.test(eventMessage)) {\n  alertType = 'dsm_update_available'; category = 'System'; severity = 'Info';\n} else if (/Update available for/i.test(eventMessage)) {\n  alertType = 'package_update_available'; category = 'System'; severity = 'Info';\n} else if (/System has started/i.test(eventMessage)) {\n  alertType = 'system_boot'; category = 'System'; severity = 'Info';\n} else if (/System is shutting down/i.test(eventMessage)) {\n  alertType = 'system_shutdown'; category = 'System'; severity = 'Info';\n}\n\nreturn [{\n  json: {\n    rawText: text,\n    receivedAt,\n    hostname,\n    date,\n    time,\n    format,\n    alertType,\n    category,\n    severity,\n    eventMessage\n  }\n}];"
       },
       "name": "Parse Alert",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [480, 300],
-      "id": "code-1"
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [480, 300]
     },
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
+          "string": [
             {
-              "id": "condition-1",
-              "leftValue": "={{ $json.category }}",
-              "rightValue": "Backup",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
+              "value1": "={{$json.category}}",
+              "value2": "Backup"
             }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
+          ]
+        }
       },
       "name": "Is Backup?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [700, 300],
-      "id": "if-1"
+      "typeVersion": 1,
+      "position": [700, 300]
     },
     {
       "parameters": {
         "rules": {
           "rules": [
             {
-              "outputKey": "Critical",
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "id": "cond-crit",
-                    "leftValue": "={{ $json.severity }}",
-                    "rightValue": "Critical",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
+              "operation": "equal",
+              "value1": "={{$json.severity}}",
+              "value2": "Critical"
             },
             {
-              "outputKey": "Warning",
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "id": "cond-warn",
-                    "leftValue": "={{ $json.severity }}",
-                    "rightValue": "Warning",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
+              "operation": "equal",
+              "value1": "={{$json.severity}}",
+              "value2": "Warning"
             }
           ]
         },
-        "options": {
-          "fallbackOutput": "extra"
-        }
+        "fallbackOutput": 2
       },
       "name": "Route by Severity",
       "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
-      "position": [920, 400],
-      "id": "switch-1"
+      "typeVersion": 1,
+      "position": [920, 400]
     },
     {
       "parameters": {},
       "name": "Backup Action",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [920, 200],
-      "id": "noop-backup"
+      "position": [920, 200]
     },
     {
       "parameters": {},
       "name": "Critical Action",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1140, 300],
-      "id": "noop-critical"
+      "position": [1140, 300]
     },
     {
       "parameters": {},
       "name": "Warning Action",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1140, 420],
-      "id": "noop-warning"
+      "position": [1140, 420]
     },
     {
       "parameters": {},
       "name": "Info Ignored",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1140, 540],
-      "id": "noop-info"
+      "position": [1140, 540]
     }
   ],
   "connections": {
@@ -215,6 +155,5 @@
         ]
       ]
     }
-  },
-  "pinData": {}
+  }
 }
