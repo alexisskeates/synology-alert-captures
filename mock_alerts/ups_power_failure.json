@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Power failure detected. System is running on UPS battery."
-  }
+  },
+  "severity": "Critical"
 }

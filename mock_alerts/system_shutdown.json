@@ -4,5 +4,6 @@
   "level": "INFO",
   "body": {
     "text": "[storage] System is shutting down"
-  }
+  },
+  "severity": "Info"
 }

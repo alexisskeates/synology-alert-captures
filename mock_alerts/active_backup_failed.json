@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Backup task for PC-001 failed"
-  }
+  },
+  "severity": "Critical"
 }

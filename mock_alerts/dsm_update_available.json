@@ -4,5 +4,6 @@
   "level": "INFO",
   "body": {
     "text": "[storage] DSM 7.2-64570 Update 3 is available"
-  }
+  },
+  "severity": "Info"
 }

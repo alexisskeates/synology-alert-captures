@@ -4,5 +4,6 @@
   "level": "INFO",
   "body": {
     "text": "[storage] System has started up"
-  }
+  },
+  "severity": "Info"
 }

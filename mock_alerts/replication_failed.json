@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Snapshot replication task [Offsite Backup] failed"
-  }
+  },
+  "severity": "Critical"
 }

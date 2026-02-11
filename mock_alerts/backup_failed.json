@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "A new system event occurred on your storage on 11-02-2026 at 03:15.\nData backup task [Daily Backup] on storage failed"
-  }
+  },
+  "severity": "Critical"
 }

@@ -4,5 +4,6 @@
   "level": "INFO",
   "body": {
     "text": "[storage] Test Message from storage"
-  }
+  },
+  "severity": "Info"
 }

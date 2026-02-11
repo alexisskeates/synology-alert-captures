@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Volume 1 has crashed"
-  }
+  },
+  "severity": "Critical"
 }

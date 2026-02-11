@@ -4,5 +4,6 @@
   "level": "WARN",
   "body": {
     "text": "[storage] Bad sectors were detected on Disk 3"
-  }
+  },
+  "severity": "Warning"
 }

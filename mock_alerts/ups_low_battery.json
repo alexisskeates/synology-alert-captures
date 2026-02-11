@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] UPS battery is low. System will shut down in 5 minutes."
-  }
+  },
+  "severity": "Critical"
 }

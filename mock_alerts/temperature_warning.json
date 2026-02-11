@@ -3,6 +3,7 @@
   "category": "Hardware",
   "level": "WARN",
   "body": {
-    "text": "[storage] System temperature is high (65°C)"
-  }
+    "text": "[storage] System temperature is high (65\u00b0C)"
+  },
+  "severity": "Warning"
 }

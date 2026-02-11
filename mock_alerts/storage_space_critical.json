@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Volume 1 is almost full (less than 1% free space)"
-  }
+  },
+  "severity": "Critical"
 }

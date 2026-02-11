@@ -4,5 +4,6 @@
   "level": "WARN",
   "body": {
     "text": "A new system event occurred on your host01 on 11-02-2026 at 21:28.\nData backup task on host01 partially completed"
-  }
+  },
+  "severity": "Warning"
 }

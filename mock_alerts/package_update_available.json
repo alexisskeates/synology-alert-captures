@@ -4,5 +4,6 @@
   "level": "INFO",
   "body": {
     "text": "[storage] Update available for Hyper Backup"
-  }
+  },
+  "severity": "Info"
 }

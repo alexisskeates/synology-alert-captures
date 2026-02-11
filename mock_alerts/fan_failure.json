@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Fan 1 has failed"
-  }
+  },
+  "severity": "Critical"
 }

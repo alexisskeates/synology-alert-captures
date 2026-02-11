@@ -4,5 +4,6 @@
   "level": "ERROR",
   "body": {
     "text": "[storage] Disk 3 is failing. Please replace it immediately."
-  }
+  },
+  "severity": "Critical"
 }
