@@ -1,0 +1,44 @@
+{
+  "received_at": "2026-02-11T22:39:16.079Z",
+  "source": "python-requests/2.32.5",
+  "method": "POST",
+  "headers": {
+    "connection": "keep-alive",
+    "host": "n8n.fourthfloor.solutions",
+    "x-forwarded-scheme": "https",
+    "x-forwarded-proto": "https",
+    "x-forwarded-for": "91.151.12.109",
+    "x-real-ip": "91.151.12.109",
+    "content-length": "79",
+    "user-agent": "python-requests/2.32.5",
+    "accept-encoding": "gzip, deflate",
+    "accept": "*/*",
+    "content-type": "application/json"
+  },
+  "query": {},
+  "body": {
+    "text": "[storage] Power failure detected. System is running on UPS battery."
+  },
+  "raw_payload": {
+    "headers": {
+      "connection": "keep-alive",
+      "host": "n8n.fourthfloor.solutions",
+      "x-forwarded-scheme": "https",
+      "x-forwarded-proto": "https",
+      "x-forwarded-for": "91.151.12.109",
+      "x-real-ip": "91.151.12.109",
+      "content-length": "79",
+      "user-agent": "python-requests/2.32.5",
+      "accept-encoding": "gzip, deflate",
+      "accept": "*/*",
+      "content-type": "application/json"
+    },
+    "params": {},
+    "query": {},
+    "body": {
+      "text": "[storage] Power failure detected. System is running on UPS battery."
+    },
+    "webhookUrl": "https://n8n.fourthfloor.solutions/webhook/dd771d80-d135-409c-a941-0f2010d7c426",
+    "executionMode": "production"
+  }
+}
