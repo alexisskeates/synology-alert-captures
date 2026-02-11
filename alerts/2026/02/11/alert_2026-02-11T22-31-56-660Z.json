@@ -1,0 +1,42 @@
+{
+  "received_at": "2026-02-11T22:31:56.660Z",
+  "source": "unknown",
+  "method": "POST",
+  "headers": {
+    "host": "n8n.fourthfloor.solutions",
+    "x-forwarded-scheme": "https",
+    "x-forwarded-proto": "https",
+    "x-forwarded-for": "91.151.12.109",
+    "x-real-ip": "91.151.12.109",
+    "content-length": "51",
+    "accept": "*/*",
+    "content-type": "application/json"
+  },
+  "query": {
+    "text": "[storage] Test Message from storage"
+  },
+  "body": {
+    "text": "[storage] Test Message from storage"
+  },
+  "raw_payload": {
+    "headers": {
+      "host": "n8n.fourthfloor.solutions",
+      "x-forwarded-scheme": "https",
+      "x-forwarded-proto": "https",
+      "x-forwarded-for": "91.151.12.109",
+      "x-real-ip": "91.151.12.109",
+      "content-length": "51",
+      "accept": "*/*",
+      "content-type": "application/json"
+    },
+    "params": {},
+    "query": {
+      "text": "[storage] Test Message from storage"
+    },
+    "body": {
+      "text": "[storage] Test Message from storage"
+    },
+    "webhookUrl": "https://n8n.fourthfloor.solutions/webhook/dd771d80-d135-409c-a941-0f2010d7c426",
+    "executionMode": "production"
+  }
+}
