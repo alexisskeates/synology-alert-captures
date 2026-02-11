@@ -28,10 +28,38 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "Backup",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-backup",
+      "name": "Is Backup Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
         "rules": {
           "rules": [
             {
-              "outputKey": "Backup",
+              "outputKey": "Critical",
               "conditions": {
                 "options": {
                   "caseSensitive": true,
@@ -40,8 +68,8 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Backup",
+                    "leftValue": "={{ $json.severity }}",
+                    "rightValue": "Critical",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -52,7 +80,7 @@
               }
             },
             {
-              "outputKey": "CMS",
+              "outputKey": "Warning",
               "conditions": {
                 "options": {
                   "caseSensitive": true,
@@ -61,92 +89,8 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "CMS",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "outputKey": "Storage",
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Storage",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "outputKey": "Hardware",
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Hardware",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "outputKey": "Security",
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Security",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "outputKey": "System",
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "System",
+                    "leftValue": "={{ $json.severity }}",
+                    "rightValue": "Warning",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -162,128 +106,68 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "switch-category",
-      "name": "Route by Category",
+      "id": "switch-severity",
+      "name": "Route by Severity",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
-      "position": [690, 300]
+      "position": [910, 400]
     },
     {
       "parameters": {
-        "content": "## Backup Alerts\n\nHandle alerts from:\n- Hyper Backup\n- Active Backup for Business\n- Snapshot Replication\n\nConnect your notification node here (Slack, Email, etc.)",
+        "content": "## Backup Alerts\n\nAll backup-related alerts come here regardless of severity:\n- Hyper Backup (completed, partial, failed)\n- Active Backup for Business\n- Snapshot Replication\n\n**Connect your Backup notification action here**",
         "height": 180,
-        "width": 280
+        "width": 320,
+        "color": 4
       },
       "id": "note-backup",
-      "name": "Backup Handler",
+      "name": "Backup Handler Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [910, 80]
+      "position": [900, 20]
     },
     {
       "parameters": {
-        "content": "## CMS Alerts\n\nHandle alerts from:\n- Server online/offline\n- CMS connection issues\n\nConnect your notification node here",
-        "height": 160,
-        "width": 280
+        "content": "## Critical Alerts (Non-Backup)\n\nCritical alerts that are NOT backup-related:\n- Server offline (CMS)\n- Volume crashed/degraded\n- Disk failing\n- UPS/Power issues\n- Fan failure\n\n**Connect your Critical notification action here**",
+        "height": 200,
+        "width": 320,
+        "color": 6
       },
-      "id": "note-cms",
-      "name": "CMS Handler",
+      "id": "note-critical",
+      "name": "Critical Handler Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [910, 200]
+      "position": [1130, 220]
     },
     {
       "parameters": {
-        "content": "## Storage Alerts\n\nHandle alerts from:\n- Volume issues\n- Disk failures\n- Space warnings\n\nConnect your notification node here",
-        "height": 160,
-        "width": 280
+        "content": "## Warning Alerts (Non-Backup)\n\nWarning alerts that are NOT backup-related:\n- Bad sectors detected\n- Storage space low\n- Temperature high\n- Failed login attempts\n- IP blocked\n\n**Connect your Warning notification action here**",
+        "height": 200,
+        "width": 320,
+        "color": 5
       },
-      "id": "note-storage",
-      "name": "Storage Handler",
+      "id": "note-warning",
+      "name": "Warning Handler Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [910, 320]
+      "position": [1130, 420]
     },
     {
       "parameters": {
-        "content": "## Hardware Alerts\n\nHandle alerts from:\n- UPS/Power\n- Temperature\n- Fan failures\n\nConnect your notification node here",
-        "height": 160,
-        "width": 280
+        "content": "## Info Alerts (Ignored)\n\nNon-backup Info alerts are ignored:\n- Test messages\n- Server online\n- CMS reconnected\n- Updates available\n- System boot/shutdown\n\n**No action needed**",
+        "height": 180,
+        "width": 320,
+        "color": 2
       },
-      "id": "note-hardware",
-      "name": "Hardware Handler",
+      "id": "note-info",
+      "name": "Info Ignored Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [910, 440]
+      "position": [1130, 620]
     },
     {
       "parameters": {
-        "content": "## Security Alerts\n\nHandle alerts from:\n- Failed logins\n- Blocked IPs\n\nConnect your notification node here",
-        "height": 160,
-        "width": 280
-      },
-      "id": "note-security",
-      "name": "Security Handler",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [910, 560]
-    },
-    {
-      "parameters": {
-        "content": "## System Alerts\n\nHandle alerts from:\n- Test messages\n- Updates available\n- Boot/shutdown\n\nConnect your notification node here",
-        "height": 160,
-        "width": 280
-      },
-      "id": "note-system",
-      "name": "System Handler",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [910, 680]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "leftValue": "={{ $json.severity }}",
-              "rightValue": "Critical",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "filter-critical",
-      "name": "Critical Only?",
-      "type": "n8n-nodes-base.filter",
-      "typeVersion": 2,
-      "position": [1220, 300]
-    },
-    {
-      "parameters": {
-        "content": "## Optional: Filter by Severity\n\nUse this filter to only process Critical alerts.\n\nYou can duplicate this pattern for each category output.",
-        "height": 120,
-        "width": 300
-      },
-      "id": "note-filter",
-      "name": "Severity Filter Note",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [1200, 180]
-    },
-    {
-      "parameters": {
-        "content": "# Synology Alert Router\n\nThis workflow:\n1. Receives alerts via webhook\n2. Parses and classifies each alert\n3. Routes to different outputs by category\n\n## Parsed Data Available:\n- `hostname` - Source NAS\n- `alertType` - Specific alert type\n- `category` - Backup, CMS, Storage, Hardware, Security, System\n- `severity` - Critical, Warning, Info\n- `eventMessage` - The alert message\n- `date` / `time` - When it occurred\n\n## To Use:\n1. Import this workflow\n2. Update the webhook path if needed\n3. Connect notification nodes to each category output\n4. Activate the workflow",
-        "height": 380,
+        "content": "# Synology Alert Router\n\n## Routing Logic:\n\n1. **Backup alerts** (any severity) → Backup node\n2. **Critical alerts** (non-backup) → Critical node\n3. **Warning alerts** (non-backup) → Warning node\n4. **Info alerts** (non-backup) → Ignored\n\n## Parsed Data Available:\n- `hostname` - Source NAS\n- `alertType` - Specific alert type\n- `category` - Backup, CMS, Storage, etc.\n- `severity` - Critical, Warning, Info\n- `eventMessage` - The alert message\n- `date` / `time` - When it occurred",
+        "height": 340,
         "width": 340
       },
       "id": "note-main",
@@ -291,6 +175,38 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [-120, 140]
+    },
+    {
+      "parameters": {},
+      "id": "noop-info",
+      "name": "No Operation (Info Ignored)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1130, 560]
+    },
+    {
+      "parameters": {},
+      "id": "backup-action",
+      "name": "Backup Action (TODO)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [910, 200]
+    },
+    {
+      "parameters": {},
+      "id": "critical-action",
+      "name": "Critical Action (TODO)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1130, 340]
+    },
+    {
+      "parameters": {},
+      "id": "warning-action",
+      "name": "Warning Action (TODO)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1130, 480]
     }
   ],
   "connections": {
@@ -309,28 +225,54 @@
       "main": [
         [
           {
-            "node": "Route by Category",
+            "node": "Is Backup Alert?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Route by Category": {
+    "Is Backup Alert?": {
       "main": [
-        [],
-        [],
         [
           {
-            "node": "Critical Only?",
+            "node": "Backup Action (TODO)",
             "type": "main",
             "index": 0
           }
         ],
-        [],
-        [],
-        [],
-        []
+        [
+          {
+            "node": "Route by Severity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Severity": {
+      "main": [
+        [
+          {
+            "node": "Critical Action (TODO)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Warning Action (TODO)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation (Info Ignored)",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -340,6 +282,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-11T22:45:00.000Z",
-  "versionId": "1"
+  "updatedAt": "2026-02-11T23:00:00.000Z",
+  "versionId": "2"
 }
