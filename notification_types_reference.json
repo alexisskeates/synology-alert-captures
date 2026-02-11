@@ -72,7 +72,7 @@
     },
 
     "backup_completed": {
-      "category": "Hyper Backup",
+      "category": "Backup",
       "level": "INFO",
       "description": "Backup task completed successfully",
       "example_body": {
@@ -82,7 +82,7 @@
     },
 
     "backup_partial": {
-      "category": "Hyper Backup",
+      "category": "Backup",
       "level": "WARN",
       "description": "Backup task partially completed (some files may have failed)",
       "example_body": {
@@ -92,7 +92,7 @@
     },
 
     "backup_failed": {
-      "category": "Hyper Backup",
+      "category": "Backup",
       "level": "ERROR",
       "description": "Backup task failed",
       "example_body": {
@@ -262,7 +262,7 @@
     },
 
     "replication_failed": {
-      "category": "Replication",
+      "category": "Backup",
       "level": "ERROR",
       "description": "Snapshot replication task failed",
       "example_body": {
@@ -272,7 +272,7 @@
     },
 
     "active_backup_completed": {
-      "category": "Active Backup for Business",
+      "category": "Backup",
       "level": "INFO",
       "description": "Active Backup task completed",
       "example_body": {
@@ -282,7 +282,7 @@
     },
 
     "active_backup_failed": {
-      "category": "Active Backup for Business",
+      "category": "Backup",
       "level": "ERROR",
       "description": "Active Backup task failed",
       "example_body": {
@@ -292,7 +292,7 @@
     },
 
     "device_offline": {
-      "category": "Active Backup for Business",
+      "category": "Backup",
       "level": "WARN",
       "description": "Managed device has gone offline",
       "example_body": {

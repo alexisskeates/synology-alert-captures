@@ -1,6 +1,6 @@
 {
   "type": "active_backup_failed",
-  "category": "Active Backup for Business",
+  "category": "Backup",
   "level": "ERROR",
   "body": {
     "text": "[storage] Backup task for PC-001 failed"

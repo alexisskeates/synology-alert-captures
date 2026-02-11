@@ -1,6 +1,6 @@
 {
   "type": "device_offline",
-  "category": "Active Backup for Business",
+  "category": "Backup",
   "level": "WARN",
   "body": {
     "text": "[storage] Device PC-001 is offline"

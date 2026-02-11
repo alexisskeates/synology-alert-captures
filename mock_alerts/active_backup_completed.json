@@ -1,6 +1,6 @@
 {
   "type": "active_backup_completed",
-  "category": "Active Backup for Business",
+  "category": "Backup",
   "level": "INFO",
   "body": {
     "text": "[storage] Backup task for PC-001 completed successfully"
