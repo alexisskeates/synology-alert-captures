@@ -1,0 +1,42 @@
+{
+  "received_at": "2026-02-11T18:27:06.929Z",
+  "source": "unknown",
+  "method": "POST",
+  "headers": {
+    "host": "n8n.fourthfloor.solutions",
+    "x-forwarded-scheme": "https",
+    "x-forwarded-proto": "https",
+    "x-forwarded-for": "82.148.62.197",
+    "x-real-ip": "82.148.62.197",
+    "content-length": "53",
+    "accept": "*/*",
+    "content-type": "application/json"
+  },
+  "query": {
+    "text": "[STO-BK01] Test Message from STO-BK01"
+  },
+  "body": {
+    "text": "[STO-BK01] Test Message from STO-BK01"
+  },
+  "raw_payload": {
+    "headers": {
+      "host": "n8n.fourthfloor.solutions",
+      "x-forwarded-scheme": "https",
+      "x-forwarded-proto": "https",
+      "x-forwarded-for": "82.148.62.197",
+      "x-real-ip": "82.148.62.197",
+      "content-length": "53",
+      "accept": "*/*",
+      "content-type": "application/json"
+    },
+    "params": {},
+    "query": {
+      "text": "[STO-BK01] Test Message from STO-BK01"
+    },
+    "body": {
+      "text": "[STO-BK01] Test Message from STO-BK01"
+    },
+    "webhookUrl": "https://n8n.fourthfloor.solutions/webhook-test/dd771d80-d135-409c-a941-0f2010d7c426",
+    "executionMode": "test"
+  }
+}
