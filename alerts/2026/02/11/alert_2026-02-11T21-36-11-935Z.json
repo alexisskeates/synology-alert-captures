@@ -1,0 +1,42 @@
+{
+  "received_at": "2026-02-11T21:36:11.935Z",
+  "source": "unknown",
+  "method": "POST",
+  "headers": {
+    "host": "n8n.fourthfloor.solutions",
+    "x-forwarded-scheme": "https",
+    "x-forwarded-proto": "https",
+    "x-forwarded-for": "82.148.62.198",
+    "x-real-ip": "82.148.62.198",
+    "content-length": "129",
+    "accept": "*/*",
+    "content-type": "application/json"
+  },
+  "query": {
+    "text": "A new system event occurred on your host01 on 11-02-2026 at 21:36.\\nA managed server (185.102.219.107) is offline"
+  },
+  "body": {
+    "text": "A new system event occurred on your host01 on 11-02-2026 at 21:36.\nA managed server (185.102.219.107) is offline"
+  },
+  "raw_payload": {
+    "headers": {
+      "host": "n8n.fourthfloor.solutions",
+      "x-forwarded-scheme": "https",
+      "x-forwarded-proto": "https",
+      "x-forwarded-for": "82.148.62.198",
+      "x-real-ip": "82.148.62.198",
+      "content-length": "129",
+      "accept": "*/*",
+      "content-type": "application/json"
+    },
+    "params": {},
+    "query": {
+      "text": "A new system event occurred on your host01 on 11-02-2026 at 21:36.\\nA managed server (185.102.219.107) is offline"
+    },
+    "body": {
+      "text": "A new system event occurred on your host01 on 11-02-2026 at 21:36.\nA managed server (185.102.219.107) is offline"
+    },
+    "webhookUrl": "https://n8n.fourthfloor.solutions/webhook/dd771d80-d135-409c-a941-0f2010d7c426",
+    "executionMode": "production"
+  }
+}
