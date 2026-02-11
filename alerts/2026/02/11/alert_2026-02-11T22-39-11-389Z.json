@@ -1,0 +1,44 @@
+{
+  "received_at": "2026-02-11T22:39:11.389Z",
+  "source": "python-requests/2.32.5",
+  "method": "POST",
+  "headers": {
+    "connection": "keep-alive",
+    "host": "n8n.fourthfloor.solutions",
+    "x-forwarded-scheme": "https",
+    "x-forwarded-proto": "https",
+    "x-forwarded-for": "91.151.12.109",
+    "x-real-ip": "91.151.12.109",
+    "content-length": "124",
+    "user-agent": "python-requests/2.32.5",
+    "accept-encoding": "gzip, deflate",
+    "accept": "*/*",
+    "content-type": "application/json"
+  },
+  "query": {},
+  "body": {
+    "text": "A new system event occurred on your host01 on 11-02-2026 at 21:40.\nA managed server (185.102.219.107) is online"
+  },
+  "raw_payload": {
+    "headers": {
+      "connection": "keep-alive",
+      "host": "n8n.fourthfloor.solutions",
+      "x-forwarded-scheme": "https",
+      "x-forwarded-proto": "https",
+      "x-forwarded-for": "91.151.12.109",
+      "x-real-ip": "91.151.12.109",
+      "content-length": "124",
+      "user-agent": "python-requests/2.32.5",
+      "accept-encoding": "gzip, deflate",
+      "accept": "*/*",
+      "content-type": "application/json"
+    },
+    "params": {},
+    "query": {},
+    "body": {
+      "text": "A new system event occurred on your host01 on 11-02-2026 at 21:40.\nA managed server (185.102.219.107) is online"
+    },
+    "webhookUrl": "https://n8n.fourthfloor.solutions/webhook/dd771d80-d135-409c-a941-0f2010d7c426",
+    "executionMode": "production"
+  }
+}
